@@ -6,20 +6,33 @@ Dans ce rapport, nous allons présenter les différents prédicats que nous avon
 ### Partie 1 : Etape préliminaire de vérification et de mise en forme de la Tbox et de la Abox
 
 **allConcepts(L)** : L contient la liste des concepts atomiques et des concepts complexes définis dans la TBox.
+
 **allInstances(L)** : L contient la liste des instances définies dans la ABox.
+
 **allRules(L)** : L contient la liste des rôles définis dans la TBox.
+
 **isAtomicConcept(X), isComplexConcept(X), isConcept(X)** : vérifient respectivement si X est un concept atomique, complexe et atomique ou complexe de la TBox.
-isIstance(I), isRule(R) : vérifient respectivement si I est une instance de la ABox et si R un rôle de la TBox.
-concept(X) : vérifie si X est une définition de concept sémantiquement et syntaxiquement correct, d’après la grammaire donnée par ALC et les conventions données dans l’énoncé. 
+
+**isIstance(I), isRule(R)** : vérifient respectivement si I est une instance de la ABox et si R un rôle de la TBox.
+
+**concept(X)** : vérifie si X est une définition de concept sémantiquement et syntaxiquement correct, d’après la grammaire donnée par ALC et les conventions données dans l’énoncé.
+
 Le prédicat est vrai si X respecte les patrons suivants : C, not(C), and(C1, C2), or(C1, C2), some(R, C), all(R, C), (I, C) et (I1, I2, R), où C, C1, C2 sont des concepts et R des rôles de la TBox (sinon échec), I, I1, I2, des instances de la ABox (sinon échec).
 La définition récursive permet de vérifier que si par exemple concept(C1) et concept(C2) sont vrais alors concept(and(not(C1), or(C2, C1))) est aussi une définition correcte de concept syntaxiquement et sémantiquement.
-isIn(C1, C2) : vérifie si le concept C1 apparaît dans la définition du concept C2. Le prédicat commence par tester l’égalité des deux concepts. Il est vrai s’ils sont égaux. Sinon, si C2 est un concept complexe, le prédicat considérera ensuite son écriture équivalente définie dans la TBox et comparera C1 à tous les concepts qui interviennent dans la définition de C2. Les récursions sont récursives. On s’arrête quand on a rencontré C1 ou si plus aucune substitution n’est possible (tous les concepts sont des concepts atomiques).
+
+**isIn(C1, C2)** : vérifie si le concept C1 apparaît dans la définition du concept C2. Le prédicat commence par tester l’égalité des deux concepts. Il est vrai s’ils sont égaux. Sinon, si C2 est un concept complexe, le prédicat considérera ensuite son écriture équivalente définie dans la TBox et comparera C1 à tous les concepts qui interviennent dans la définition de C2. Les récursions sont récursives. On s’arrête quand on a rencontré C1 ou si plus aucune substitution n’est possible (tous les concepts sont des concepts atomiques).
+
 Un concept est autoréférent s’il apparaît dans sa propre définition. Le prédicat isIn nous permet ensuite de facilement définir le prédicat autoref.
-autoref(X) : vérifie si X est un concept autoréférent. Par définition, les concepts atomiques ne peuvent être autoréférents. Le prédicat vérifie donc s’il existe une définition du concept X dans la TBox et appelle ensuite le prédicat isIn pour déterminer si X apparaît dans sa propre définition donnée dans la TBox.
-atomize(C, NC) : ce prédicat donne dans NC une écriture équivalente du concept C qui ne contient que des concepts atomiques et qui est sous forme normale négative.
-traitement_Tbox(TBox) : ce prédicat donne la TBox sous forme de liste. Pour chaque définition equiv(C1, C2) donnée dans TBox, le prédicat renvoie (C1, NC2) où NC2 est une réécriture sous forme normale négative de C2 avec des concepts atomiques. 
+
+**autoref(X)** : vérifie si X est un concept autoréférent. Par définition, les concepts atomiques ne peuvent être autoréférents. Le prédicat vérifie donc s’il existe une définition du concept X dans la TBox et appelle ensuite le prédicat isIn pour déterminer si X apparaît dans sa propre définition donnée dans la TBox.
+
+**atomize(C, NC)** : ce prédicat donne dans NC une écriture équivalente du concept C qui ne contient que des concepts atomiques et qui est sous forme normale négative.
+
+**traitement_Tbox(TBox)** : ce prédicat donne la TBox sous forme de liste. Pour chaque définition equiv(C1, C2) donnée dans TBox, le prédicat renvoie (C1, NC2) où NC2 est une réécriture sous forme normale négative de C2 avec des concepts atomiques. 
+
 Le prédicat utilise à cet effet les prédicats atomize pour la réécriture des concepts et le prédicat element_TBox(L, TBox). Ce dernier reçoit la liste des concepts complexes de la TBox et constitue la  liste TBox comme expliqué ci-dessus.
-traitement_i_Abox(Abi) : ce prédicat donne la liste des assertions des concepts de la ABox. Pour chaque inst(I, C) donnée dans la ABox, le prédicat renvoie (I, NC) où NC est une réécriture sous forme normale négative de C avec des concepts atomiques.
+
+**traitement_i_Abox(Abi)** : ce prédicat donne la liste des assertions des concepts de la ABox. Pour chaque inst(I, C) donnée dans la ABox, le prédicat renvoie (I, NC) où NC est une réécriture sous forme normale négative de C avec des concepts atomiques.
 Le prédicat utilise à cet effet les prédicats atomize pour la réécriture des concepts et le prédicat element_i_ABox(L, Abi). Ce dernier reçoit la liste de couple instance et concept et constitue la liste Abi comme expliqué ci-dessus.
 traitement_r_Abox(Abr) : ce prédicat donne la liste des assertions des rôles de la ABox. Pour chaque instR(I1, I2, R) donnée dans la ABox, le prédicat renvoie (I1, I2, R) et constitue ainsi la liste Abr.
 traitement_Abox(Abi, Abr) : ce prédicat utilise les prédicats traitement_i_Abox et traitement_r_Abox pour constituer respectivement la liste des assertions de concepts et la liste des assertions de rôles. Abi est la liste des assertions des concepts et Abr est la liste des assertions de rôles.
